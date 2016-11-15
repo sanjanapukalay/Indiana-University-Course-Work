@@ -1,0 +1,5 @@
+Enclosed is the spreadsheet with statistical comparison of performance of all the algorithms. For every query, we computed precision and recall when returning different number of result documents, for example from 1 to 1000. We attain the interpolated average precision of all models as shown in the SUMMARY table in the spreadsheet.
+
+The interpolated average precisions of all models for recall values from 0.00 to 1.00 and are calculated as avg of all "iprec_at_recall_XX" values for both long and short queries. 
+
+From experimental values, we conclude that the BM25 method is a better option to statistical language models and very closely matches in performance with Vector space model. 
