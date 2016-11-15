@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Data Visualization Week-11: Maps</title>
+<style>
+div p{text-align:center;font-size:21px}
+div {padding-top:50px}
+.counties {
+                fill: #000;
+                stroke: #fff;
+                stroke-width: 0.5px;
+ }
+ .states {
+                fill: none;
+                stroke: #fff;
+                stroke-linejoin: round;
+}
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: #222;
+}
+
+.county-boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+.state-boundary {
+  fill: none;
+  stroke: #fff;
+}
+
+</style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<b><h2>Data Visualization</h2><h3>Week-11</h3><p>Result:</p></b>
+<div id="container1">
+<b><p>Albers Projection:</p></b>
+<script>
+var width = 960, height = 500;
+
+var path = d3.geo.path();
+
+var svg = d3.select("#container1").append("svg")
+                     .attr("width", width)
+                     .attr("height", height);
+
+d3.json("us.json", function(error, us) {    
+        console.log(topojson.feature(us, us.objects.states));
+        svg.append("g")
+        .attr("class", "counties")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.counties).features)
+        .enter().append("path")
+        .attr("d", path);
+		svg.append("path")
+		.datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+		.attr("class", "states")
+		.attr("d", path);
+
+});
+
+</script>
+</div>
+<div id="lame">
+<b><p>Albers Equal-Area Conic:</p></b>
+<script>
+
+var w = 960,
+    h = 500;
+
+var projection = d3.geo.albers()
+    .rotate([96, 0])
+    .center([-.6, 38.7])
+    .parallels([29.5, 45.5])
+    .scale(1070)
+    .translate([w / 2, h / 2])
+    .precision(.1);
+
+var path1 = d3.geo.path()
+    .projection(projection);
+
+var graticule = d3.geo.graticule()
+    .extent([[-98 - 45, 38 - 45], [-98 + 45, 38 + 45]])
+    .step([5, 5]);
+
+var svg2 = d3.select("#lame").append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+svg2.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path1);
+
+d3.json("us.json", function(error, us) {
+  if (error) throw error;
+
+  svg2.insert("path", ".graticule")
+      .datum(topojson.feature(us, us.objects.land))
+      .attr("class", "land")
+      .attr("d", path1);
+
+  svg2.insert("path", ".graticule")
+      .datum(topojson.mesh(us, us.objects.counties, function(a, b) { return a !== b && !(a.id / 1000 ^ b.id / 1000); }))
+      .attr("class", "county-boundary")
+      .attr("d", path1);
+
+  svg2.insert("path", ".graticule")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "state-boundary")
+      .attr("d", path1);
+});
+
+d3.select(self.frameElement).style("height", height + "px");
+
+</script></div>
+<div id = "Stereographic">
+<b><p>Stereographic:</p></b>
+<script>
+
+var width1 = 960,
+    height1 = 960;
+
+var projection1 = d3.geo.stereographic()
+    .scale(245)
+    .translate([width1 / 2, height1 / 2])
+    .rotate([-20, 0])
+    .clipAngle(180 - 1e-4)
+    .clipExtent([[0, 0], [width1, height1]])
+    .precision(.1);
+
+var path2 = d3.geo.path()
+    .projection(projection1);
+
+var graticule1 = d3.geo.graticule();
+
+var svg3 = d3.select("#Stereographic").append("svg")
+    .attr("width", width1)
+    .attr("height", height1);
+
+svg3.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path2);
+
+d3.json("us.json", function(error, world) {
+  if (error) throw error;
+
+svg3.insert("path", ".graticule")
+      .datum(topojson.feature(world, world.objects.land))
+      .attr("class", "land")
+      .attr("d", path2);
+
+  svg3.insert("path", ".graticule")
+      .datum(topojson.mesh(world, world.objects.counties, function(a, b) { return a !== b }))
+      .attr("class", "county-boundary")
+      .attr("d", path2);
+
+  svg3.insert("path", ".graticule")
+      .datum(topojson.mesh(world, world.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "state-boundary")
+      .attr("d", path2);
+});
+
+d3.select(self.frameElement).style("height", height1 + "px");
+
+</script>
+</div>
+</body>
+</html>

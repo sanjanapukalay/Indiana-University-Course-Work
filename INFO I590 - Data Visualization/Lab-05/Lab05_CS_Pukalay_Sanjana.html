@@ -1,0 +1,32 @@
+<html>
+	<body>
+		<h1>Please enter a number of your choice:</h1>
+		<form id = "myForm">
+			Input: <input type = "text" name = "number"><br/><br/>
+		</form>
+
+		<button onclick = "adder()">Submit</button><br/><br/>
+		Result:  <p id = "result">0</p>
+
+		<script type = "text/javascript">
+			function adder() 
+				{
+ 					var result = parseInt(document.getElementById("result").innerHTML);
+					if(result < 100)
+						{
+  							var num =  parseInt(document.getElementById("myForm").elements[0].value);
+    						result = result + num;
+    						console.log("Sum = " + result );
+    						if(result >= 100)
+    							{
+    								alert("Process Ended");
+    							}
+    						else
+    							{
+    								document.getElementById("result").innerHTML = result;
+    							}
+  						} 
+				}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Data Visualization Week-10: Line Chart</title>
+
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<style>
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.area {
+  fill: steelblue;
+}
+</style>
+</head>
+<body>
+<h2>Data Visualization</h2><h3>Week-10</h3><p>Result<br/> <button id="start">Start</button>
+<button id="reset">Reset</button></p>
+
+<script type="text/javascript">
+var dataset;
+var width = 800;
+var height = 500;
+var padding = 60;
+d3.csv("spanish-silver.csv", function(data) {
+	data.forEach(function(d){
+	d.year = +d.year;
+	d.silver_minted = +d.silver_minted;
+	dataset = data;
+	})
+	console.log(dataset[0]);
+  var ymin = d3.min(dataset, function(d) {return +d.silver_minted; });
+  var xmin = d3.min(dataset, function(d) {return +d.year; });	
+  var ymax = d3.max(dataset, function(d) {return +d.silver_minted; });
+  var xmax = d3.max(dataset, function(d) {return +d.year; });
+  var xScale = d3.scale.linear().domain([xmin, xmax]).range([padding, width - padding]).nice();
+  var yScale = d3.scale.linear().domain([ymin, ymax]).range([height - padding,padding]).nice();
+  var rScale = d3.scale.linear().domain([0, 10]).range([0, 100]).nice();
+  var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+  var yAxis = d3.svg.axis().scale(yScale).orient("left"); 
+  var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+
+
+   svg.append("g")
+   .attr("class", "x axis")
+   .attr("transform", "translate(0," + (height - padding) +")")
+   .call(xAxis);
+svg.append("g")
+   .attr("class", "y axis")
+   .attr("transform", "translate(" + (padding) +",0)")
+   .call(yAxis);	
+d3.select("#start").on("click", function() {
+var line = d3.svg.line()
+    .x(function(d) { return xScale(d.year); })
+    .y(function(d) { return yScale(d.silver_minted); })
+    .interpolate("linear");
+var path = svg.append("path")
+    .attr("class", "line")
+    .attr("d", line(data))
+    .attr("stroke", "steelblue")
+    .attr("fill", "none");	
+  var totalLength = path.node().getTotalLength();
+  path
+.attr("stroke-dasharray", totalLength + " " + totalLength)
+.attr("stroke-dashoffset", totalLength)
+.transition() 
+.duration(5000) 
+.ease("linear") 
+.attr("stroke-dashoffset", 0); 
+});   
+d3.select("#reset").on("click", function() {
+  d3.select("path.line").remove();
+});   
+  });
+
+</script>
+
+</body></html>
